@@ -1,0 +1,88 @@
+const products = [
+  {
+    id: 1,
+    nama: "Laptop ASUS VivoBook",
+    harga: 7500000,
+    deskripsi: "Laptop untuk kebutuhan kerja dan belajar.",
+    icon: "bi bi-laptop",
+  },
+  {
+    id: 2,
+    nama: "Smartphone Samsung",
+    harga: 4500000,
+    deskripsi: "Smartphone dengan performa yang responsif.",
+    icon: "bi bi-phone",
+  },
+  {
+    id: 3,
+    nama: "Headphone Wireless",
+    harga: 350000,
+    deskripsi: "Headphone nirkabel dengan suara jernih.",
+    icon: "bi bi-headphones",
+  },
+  {
+    id: 4,
+    nama: "Smartwatch",
+    harga: 850000,
+    deskripsi: "Jam tangan pintar dengan berbagai fitur.",
+    icon: "bi bi-smartwatch",
+  },
+  {
+    id: 5,
+    nama: "Kamera Digital",
+    harga: 5200000,
+    deskripsi: "Kamera untuk mengabadikan berbagai momen.",
+    icon: "bi bi-camera",
+  },
+  {
+    id: 6,
+    nama: "Speaker Bluetooth",
+    harga: 450000,
+    deskripsi: "Speaker portabel dengan koneksi Bluetooth.",
+    icon: "bi bi-speaker",
+  },
+  {
+    id: 7,
+    nama: "Mouse Wireless",
+    harga: 150000,
+    deskripsi: "Mouse tanpa kabel untuk komputer dan laptop.",
+    icon: "bi bi-mouse",
+  },
+  {
+    id: 8,
+    nama: "Keyboard Mechanical",
+    harga: 550000,
+    deskripsi: "Keyboard mekanis untuk mengetik dan bermain game.",
+    icon: "bi bi-keyboard",
+  },
+  {
+    id: 9,
+    nama: "Monitor LED",
+    harga: 1800000,
+    deskripsi: "Monitor untuk kebutuhan multimedia.",
+    icon: "bi bi-display",
+  },
+  {
+    id: 10,
+    nama: "Tablet",
+    harga: 3200000,
+    deskripsi: "Tablet untuk hiburan dan produktivitas.",
+    icon: "bi bi-tablet",
+  },
+  {
+    id: 11,
+    nama: "Printer",
+    harga: 1200000,
+    deskripsi: "Printer untuk mencetak dokumen dan gambar.",
+    icon: "bi bi-printer",
+  },
+  {
+    id: 12,
+    nama: "Game Controller",
+    harga: 400000,
+    deskripsi: "Controller untuk bermain game.",
+    icon: "bi bi-controller",
+  },
+];
+
+export default products;
