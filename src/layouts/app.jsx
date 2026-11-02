@@ -25,12 +25,12 @@ export function Navbar() {
         >
           <ul className="navbar-nav text-center mx-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">
+              <a className="nav-link active" aria-current="page" href="/">
                 Home
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">
+              <a className="nav-link active" aria-current="page" href="/produk">
                 Produk
               </a>
             </li>
@@ -176,7 +176,6 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
         <hr />
 
         <div className="d-flex flex-column flex-md-row justify-content-between gap-2 text-secondary small">
