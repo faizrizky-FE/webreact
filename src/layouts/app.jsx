@@ -1,13 +1,19 @@
+import { Link, NavLink } from "react-router-dom";
+
 export function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top border-bottom">
       <div className="container-fluid">
-        <a className="navbar-brand ms-5 " style={{ fontSize: "25px" }} href="#">
+        <Link
+          className="navbar-brand mx-5 "
+          style={{ fontSize: "25px" }}
+          to="/"
+        >
           <i className="bi bi-bag text-primary"></i>
           <b>
             <span className="text-primary"> Izz</span>Shop
           </b>
-        </a>
+        </Link>
         <button
           className="navbar-toggler"
           type="button"
@@ -25,26 +31,34 @@ export function Navbar() {
         >
           <ul className="navbar-nav text-center mx-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="/">
+              <NavLink className="nav-link" aria-current="page" to="/">
                 Home
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="/produk">
+              <NavLink className="nav-link" aria-current="page" to="/produk">
                 Produk
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">
+              <NavLink className="nav-link" aria-current="page" to="/tentang">
                 Tentang
-              </a>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="#">
+              <NavLink className="nav-link" aria-current="page" to="/kontak">
                 Kontak
-              </a>
+              </NavLink>
             </li>
           </ul>
+
+          <NavLink
+            to=""
+            className="mx-2 pb-1 fs-4 text-dark bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+            style={{ width: "40px", height: "40px" }}
+          >
+            <i className="bi bi-person"></i>
+          </NavLink>
           <form className="d-flex" role="search">
             <input
               className="form-control me-2"
@@ -53,9 +67,9 @@ export function Navbar() {
               aria-label="Search"
             />
           </form>
-          <a href="" className="mx-3 fs-4 text-dark">
+          <NavLink to="" className="mx-3 fs-4 text-dark">
             <i className="bi bi-cart3"></i>
-          </a>
+          </NavLink>
         </div>
       </div>
     </nav>
@@ -69,28 +83,31 @@ export function Footer() {
         <div className="row g-4 mb-4">
           {/* Informasi toko */}
           <div className="col-12 col-md-6 col-lg-4">
-            <a href="/" className="text-decoration-none text-dark fs-4 fw-bold">
+            <NavLink
+              to="/"
+              className="text-decoration-none text-dark fs-4 fw-bold"
+            >
               <i className="bi bi-bag text-primary"></i>{" "}
               <span className="text-primary">Izz</span>Shop
-            </a>
+            </NavLink>
 
             <p className="text-secondary mt-3">
               Solusi belanja online untuk kebutuhan modern Anda.
             </p>
 
             <div className="d-flex gap-3 fs-5">
-              <a href="#" className="text-dark">
+              <NavLink to="#" className="text-dark">
                 <i className="bi bi-instagram"></i>
-              </a>
-              <a href="#" className="text-dark">
+              </NavLink>
+              <NavLink to="#" className="text-dark">
                 <i className="bi bi-facebook"></i>
-              </a>
-              <a href="#" className="text-dark">
+              </NavLink>
+              <NavLink to="#" className="text-dark">
                 <i className="bi bi-youtube"></i>
-              </a>
-              <a href="#" className="text-dark">
+              </NavLink>
+              <NavLink to="#" className="text-dark">
                 <i className="bi bi-twitter-x"></i>
-              </a>
+              </NavLink>
             </div>
           </div>
 
@@ -99,33 +116,33 @@ export function Footer() {
             <h6 className="fw-bold mb-3">Navigasi</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
-                <a href="/" className="text-secondary text-decoration-none">
+                <NavLink to="/" className="text-secondary text-decoration-none">
                   Beranda
-                </a>
+                </NavLink>
               </li>
               <li className="mb-2">
-                <a
-                  href="/produk"
+                <NavLink
+                  to="/produk"
                   className="text-secondary text-decoration-none"
                 >
                   Produk
-                </a>
+                </NavLink>
               </li>
               <li className="mb-2">
-                <a
-                  href="#tentang"
+                <NavLink
+                  to="/tentang"
                   className="text-secondary text-decoration-none"
                 >
                   Tentang
-                </a>
+                </NavLink>
               </li>
               <li className="mb-2">
-                <a
-                  href="#kontak"
+                <NavLink
+                  to="/kontak"
                   className="text-secondary text-decoration-none"
                 >
                   Kontak
-                </a>
+                </NavLink>
               </li>
             </ul>
           </div>
@@ -135,24 +152,24 @@ export function Footer() {
             <h6 className="fw-bold mb-3">Bantuan</h6>
             <ul className="list-unstyled">
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none">
+                <NavLink to="#" className="text-secondary text-decoration-none">
                   Cara Belanja
-                </a>
+                </NavLink>
               </li>
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none">
+                <NavLink to="#" className="text-secondary text-decoration-none">
                   Pengiriman
-                </a>
+                </NavLink>
               </li>
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none">
+                <NavLink to="#" className="text-secondary text-decoration-none">
                   Pembayaran
-                </a>
+                </NavLink>
               </li>
               <li className="mb-2">
-                <a href="#" className="text-secondary text-decoration-none">
+                <NavLink to="#" className="text-secondary text-decoration-none">
                   FAQ
-                </a>
+                </NavLink>
               </li>
             </ul>
           </div>

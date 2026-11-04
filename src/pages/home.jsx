@@ -14,12 +14,12 @@ function Home() {
                 <span className="badge rounded-pill bg-primary-subtle text-primary px-3 py-2">
                   Produk Terbaik
                 </span>
-                <h1 className="fw-bold">
+                <h1 className="display-5 fw-bold">
                   Belanja Mudah
                   <br />
                   Hidup Lebih Praktis
                 </h1>
-                <p>
+                <p className="fs-5 text-secondary">
                   Temukan berbagai produk kebutuhan sehari-hari <br />
                   dengan harga terbaik dan kuailitas terjamin
                 </p>

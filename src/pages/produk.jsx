@@ -191,8 +191,12 @@ function Produk() {
                   </div>
                   <hr />
                   <div className="d-flex justify-content-between align-items-center gap-3">
-                    <button type="button" class="btn btn-primary w-100">Reset filter</button>
-                    <button type="button" class="btn btn-primary w-100">Terapkan</button>
+                    <button type="button" class="btn btn-primary w-100">
+                      Reset filter
+                    </button>
+                    <button type="button" class="btn btn-primary w-100">
+                      Terapkan
+                    </button>
                   </div>
                 </div>
               </div>
@@ -270,7 +274,7 @@ function Produk() {
         {jumlahProduk < products.length && (
           <div className="text-center pb-5">
             <p
-              className="btntext-dark px-4 fw-bold"
+              className="btntext-dark fw-bold"
               onClick={() => setJumlahProduk(products.length)}
             >
               — Lihat Lebih Banyak —
