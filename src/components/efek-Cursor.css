@@ -1,0 +1,12 @@
+.solar-cursor {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+@media (pointer: fine) {
+  body {
+    cursor: none;
+  }
+}

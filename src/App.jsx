@@ -4,10 +4,13 @@ import Home from "./pages/home";
 import Produk from "./pages/produk";
 import Tentang from "./pages/tentang";
 import Kontak from "./pages/kontak";
+import SolarCursor from "./components/efekCursor";
 
 function App() {
   return (
     <>
+    <SolarCursor />
+    
       <Navbar />
 
       <Routes>

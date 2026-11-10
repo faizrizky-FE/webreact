@@ -207,7 +207,7 @@ function Produk() {
                   className="form-select border-primary"
                   aria-label="Default select example"
                 >
-                  <option selected>Semua Kategori</option>
+                  <option disabled selected>Semua Kategori</option>
                   <option value="1">Smartphone</option>
                   <option value="2">Laptop</option>
                   <option value="3">Headphone</option>
@@ -222,7 +222,7 @@ function Produk() {
                   className="form-select border-primary"
                   aria-label="Default select example"
                 >
-                  <option selected>Urutkan</option>
+                  <option disabled selected>Urutkan</option>
                   <option value="1">Terlaris</option>
                   <option value="2">Termurah</option>
                   <option value="3">Termahal</option>
@@ -274,7 +274,7 @@ function Produk() {
         {jumlahProduk < products.length && (
           <div className="text-center pb-5">
             <p
-              className="btntext-dark fw-bold"
+              className="btntext text-secondary"
               onClick={() => setJumlahProduk(products.length)}
             >
               — Lihat Lebih Banyak —
