@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Tentang() {
   return (
     <main className="py-5 my-5">
@@ -16,12 +18,12 @@ function Tentang() {
                 elektronik dan teknologi untuk kebutuhan sehari-hari, mulai dari
                 laptop dan smartphone hingga aksesori.
               </p>
-              <a
-                href="/produk"
+              <Link
+                to="/produk"
                 className="btn btn-primary rounded-pill px-4 py-2"
               >
                 Lihat koleksi <i className="bi bi-arrow-up-right ms-2"></i>
-              </a>
+              </Link>
             </div>
 
             <div className="col-lg-6">

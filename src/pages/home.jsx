@@ -1,4 +1,5 @@
 import products from "../data/produk";
+import { Link } from "react-router-dom";
 
 function Home() {
   return (
@@ -23,11 +24,11 @@ function Home() {
                   Temukan berbagai produk kebutuhan sehari-hari <br />
                   dengan harga terbaik dan kuailitas terjamin
                 </p>
-                <a href="/produk">
+                <Link to="/produk">
                   <button type="button" className="btn btn-primary">
                     Belanja Sekarang →
                   </button>
-                </a>
+                </Link>
               </div>
               <img
                 src="/gambar3.jpg"
@@ -49,79 +50,79 @@ function Home() {
           <div className="container text-center">
             <div className="row row-cols-7">
               <div className="col">
-                <a
-                  href=""
+                <Link
+                  to=""
                   className="bg-primary bg-opacity-10 rounded-5  d-inline-flex align-items-center justify-content-center"
                   style={{ width: "105px", height: "78px" }}
                 >
                   <i className="bi bi-phone fs-1 text-primary"></i>
-                </a>
+                </Link>
                 <br />
                 <p className="fw-bold">Smartphone</p>
               </div>
               <div className="col">
-                <a
-                  href=""
+                <Link
+                  to=""
                   className="bg-primary bg-opacity-10 rounded-5  d-inline-flex align-items-center justify-content-center"
                   style={{ width: "105px", height: "78px" }}
                 >
                   <i className="bi bi-laptop fs-1 text-info"></i>
-                </a>
+                </Link>
                 <br />
                 <p className="fw-bold">Laptop</p>
               </div>
               <div className="col">
-                <a
-                  href=""
+                <Link
+                  to=""
                   className="bg-primary bg-opacity-10 rounded-5  d-inline-flex align-items-center justify-content-center"
                   style={{ width: "105px", height: "78px" }}
                 >
                   <i className="bi bi-headphones fs-1 text-secondary"></i>
-                </a>
+                </Link>
                 <br />
                 <p className="fw-bold ">Headphone</p>
               </div>
               <div className="col">
-                <a
-                  href=""
+                <Link
+                  to=""
                   className="bg-primary bg-opacity-10 rounded-5  d-inline-flex align-items-center justify-content-center"
                   style={{ width: "105px", height: "78px" }}
                 >
                   <i className="bi bi-smartwatch fs-1 text-success"></i>
-                </a>
+                </Link>
                 <br />
                 <p className="fw-bold">Smartwach</p>
               </div>
               <div className="col">
-                <a
-                  href=""
+                <Link
+                  to=""
                   className="bg-primary bg-opacity-10 rounded-5  d-inline-flex align-items-center justify-content-center"
                   style={{ width: "105px", height: "78px" }}
                 >
                   <i className="bi bi-camera fs-1 text-primary"></i>
-                </a>
+                </Link>
                 <br />
                 <p className="fw-bold">Camera</p>
               </div>
               <div className="col">
-                <a
-                  href=""
+                <Link
+                  to=""
                   className="bg-primary bg-opacity-10 rounded-5  d-inline-flex align-items-center justify-content-center"
                   style={{ width: "105px", height: "78px" }}
                 >
                   <i className="bi bi-controller fs-1 text-warning"></i>
-                </a>
+                </Link>
                 <br />
                 <p className="fw-bold">Gaming</p>
               </div>
               <div className="col">
-                <a
-                  href=""
+                <Link
+                  to=""
                   className="bg-primary bg-opacity-10 rounded-5  d-inline-flex align-items-center justify-content-center"
                   style={{ width: "105px", height: "78px" }}
                 >
                   <i className="bi bi-bag-check fs-1 text-primary"></i>
-                </a>
+                </Link>
                 <br />
                 <p className="fw-bold">Aksesoris</p>
               </div>
@@ -134,9 +135,9 @@ function Home() {
         <div className="container px-0">
           <div className="d-flex align-items-center justify-content-between">
             <h2 className="fw-bold">Produk</h2>
-            <a href="/produk" className="fw-bold text-dark">
+            <Link to="/produk" className="fw-bold text-dark">
               Lihat Semua Produk
-            </a>
+            </Link>
           </div>
         </div>
         <div className="container px-0 pt-3 pb-5">

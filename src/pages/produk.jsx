@@ -191,10 +191,10 @@ function Produk() {
                   </div>
                   <hr />
                   <div className="d-flex justify-content-between align-items-center gap-3">
-                    <button type="button" class="btn btn-primary w-100">
+                    <button type="button" className="btn btn-primary w-100">
                       Reset filter
                     </button>
-                    <button type="button" class="btn btn-primary w-100">
+                    <button type="button" className="btn btn-primary w-100">
                       Terapkan
                     </button>
                   </div>
