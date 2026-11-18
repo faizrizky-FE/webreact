@@ -53,7 +53,7 @@ export function Navbar() {
           </ul>
 
           <NavLink
-            to=""
+            to="/profile"
             className="mx-2 pb-1 fs-4 text-dark bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
             style={{ width: "40px", height: "40px" }}
           >

@@ -135,7 +135,7 @@ function Home() {
         <div className="container px-0">
           <div className="d-flex align-items-center justify-content-between">
             <h2 className="fw-bold">Produk</h2>
-            <Link to="/produk" className="fw-bold text-dark">
+            <Link to="/produk" className="btn btn-text fw-bold text-dark">
               Lihat Semua Produk
             </Link>
           </div>

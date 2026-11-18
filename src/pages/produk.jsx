@@ -1,7 +1,10 @@
-import products from "../data/produk";
 import { useState } from "react";
-
+import { useProduk } from "../context/ProdukContext";
 function Produk() {
+  const { produk, produkSaya } = useProduk();
+  const semuaProduk = [...produk, ...produkSaya];
+  console.log(semuaProduk);
+
   const [jumlahProduk, setJumlahProduk] = useState(8);
   return (
     <main className="py-5 my-5">
@@ -9,6 +12,9 @@ function Produk() {
         <div className="container px-0">
           <h1>Semua Produk</h1>
           <p>Temukan produk pilihan untuk kebutuhan Anda</p>
+          <p className="text-secondary">
+            Menampilkan {semuaProduk.length} produk
+          </p>
         </div>
       </section>
 
@@ -207,14 +213,16 @@ function Produk() {
                   className="form-select border-primary"
                   aria-label="Default select example"
                 >
-                  <option disabled selected>Semua Kategori</option>
+                  <option selected>
+                    Semua Kategori
+                  </option>
                   <option value="1">Smartphone</option>
                   <option value="2">Laptop</option>
-                  <option value="3">Headphone</option>
-                  <option value="4">Smartwach</option>
-                  <option value="5">Camera</option>
-                  <option value="6">Gaming</option>
-                  <option value="7">Aksesoris</option>
+                  <option value="3">Tablet</option>
+                  <option value="4">Headphone</option>
+                  <option value="5">Smartwach</option>
+                  <option value="6">Speaker</option>
+                  <option value="7">Charger & aksesoris</option>
                 </select>
               </div>
               <div>
@@ -222,8 +230,10 @@ function Produk() {
                   className="form-select border-primary"
                   aria-label="Default select example"
                 >
-                  <option disabled selected>Urutkan</option>
-                  <option value="1">Terlaris</option>
+                  <option disabled selected>
+                    Urutkan
+                  </option>
+                  <option value="1">Terbaru</option>
                   <option value="2">Termurah</option>
                   <option value="3">Termahal</option>
                 </select>
@@ -236,17 +246,22 @@ function Produk() {
       <section>
         <div className="container px-0 pt-3 pb-5">
           <div className="row row-cols-1 row-cols-md-4 g-4">
-            {products.slice(0, jumlahProduk).map((product) => (
+            {semuaProduk.slice(0, jumlahProduk).map((product) => (
               <div className="col" key={product.id}>
                 <div className="card h-100 shadow-sm rounded-1 border-0 overflow-hidden rounded-4">
                   <div
                     className="d-flex justify-content-center align-items-center py-4 position-relative"
                     style={{ backgroundColor: "#ecf4ffaf" }}
                   >
-                    <i
-                      className={`${product.icon} text-dark`}
-                      style={{ fontSize: "100px" }}
-                    ></i>
+                    <img
+                      src={product.gambar}
+                      alt={product.nama}
+                      className="img-fluid"
+                      style={{ height: "180px", objectFit: "contain" }}
+                      onError={(e) => {
+                        e.target.src = "/gambar-default.png";
+                      }}
+                    />
                     <button
                       className="btn btn-light rounded-circle position-absolute top-0 end-0 m-2"
                       type="button"
@@ -254,11 +269,21 @@ function Produk() {
                       <i className="bi bi-heart text-secondary"></i>
                     </button>
                   </div>
-                  <div className="card-body ">
-                    <h6 className="card-title fw-bold">{product.nama}</h6>
-                    <p className="card-text text-secondary">
+                  <div className="card-body">
+                    <h6 className="card-title fw-bold">
+                      <h6 className="card-title fw-bold">
+                        {product.nama.split(" ").length > 3
+                          ? product.nama.split(" ").slice(0, 3).join(" ") +
+                            " ..."
+                          : product.nama}
+                      </h6>
+                    </h6>
+                    <div
+                      className="text-secondary overflow-auto mb-3"
+                      style={{ height: "80px" }}
+                    >
                       {product.deskripsi}
-                    </p>
+                    </div>
                     <h6 className="text-primary">
                       Rp {product.harga.toLocaleString("id-ID")}
                     </h6>
@@ -271,11 +296,11 @@ function Produk() {
             ))}
           </div>
         </div>
-        {jumlahProduk < products.length && (
+        {jumlahProduk < semuaProduk.length && (
           <div className="text-center pb-5">
             <p
-              className="btntext text-secondary"
-              onClick={() => setJumlahProduk(products.length)}
+              className="btn btn-text text-secondary"
+              onClick={() => setJumlahProduk(semuaProduk.length)}
             >
               — Lihat Lebih Banyak —
             </p>

@@ -1,58 +1,24 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-
-const kontakSchema = z.object({
-  nama: z
-    .string()
-    .min(3, "masukkan minimal 3 karakter")
-    .max(20, "nama tidak boleh lebih dari 20 karakter"),
-  email: z.string().email("email tidak valid"),
-  topik: z.string().min(1, "wajib memilih salah satu"),
-  pesan: z.string().min(100, "minimal 100 karakter"),
-});
+import useFormValidasi from "../hooks/useFormValidasi";
+import { kontakSchema } from "../utils/validasiForm";
 
 function Kontak() {
-  const [berhasil, setBerhasil] = useState(false);
-  const [gagal, setGagal] = useState(false);
+  const kirimPesan = async (data) => {
+    console.log("mengirim...");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log("berhasil terkirim!");
+    console.log(data);
+  };
 
   const {
     register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: zodResolver(kontakSchema),
-    defaultValues: {
-      nama: "",
-      email: "",
-      topik: "",
-      pesan: "",
-    },
-  });
-
-  const onSubmit = async (data) => {
-    setBerhasil(false);
-    setGagal(false);
-
-    try {
-      console.log("mengirim...");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      console.log("berhasil terkirim!");
-      console.log(data);
-      reset();
-      setBerhasil(true);
-    } catch (errors) {
-      console.log("gagal mengirim data!");
-      setGagal(true);
-    }
-  };
-
-  const resetStatus = () => {
-    setBerhasil(false);
-    setGagal(false);
-  };
+    submitForm,
+    errors,
+    isSubmitting,
+    berhasil,
+    gagal,
+    resetStatus,
+    batalForm,
+  } = useFormValidasi(kontakSchema, kirimPesan);
 
   return (
     <main className="py-5 my-5">
@@ -122,7 +88,7 @@ function Kontak() {
               <div className="card border-0 shadow-sm rounded-4">
                 <div className="card-body p-4 p-md-5">
                   <h2 className="h4 fw-bold mb-4">Kirim pesan</h2>
-                  <form onSubmit={handleSubmit(onSubmit)}>
+                  <form onSubmit={submitForm}>
                     <div className="row g-3">
                       <div className="col-md-6">
                         <label
@@ -138,7 +104,7 @@ function Kontak() {
                           placeholder="Nama Anda"
                           autoComplete="name"
                           {...register("nama", {
-                            onChange: resetStatus
+                            onChange: resetStatus,
                           })}
                         />
                         {errors.nama && (
@@ -161,7 +127,7 @@ function Kontak() {
                           placeholder="example@gmail.com"
                           autoComplete="email"
                           {...register("email", {
-                            onChange: resetStatus
+                            onChange: resetStatus,
                           })}
                         />
                         {errors.email && (
@@ -181,7 +147,7 @@ function Kontak() {
                           className="form-select"
                           id="topik"
                           {...register("topik", {
-                            onChange: resetStatus
+                            onChange: resetStatus,
                           })}
                         >
                           <option value="" disabled>
@@ -211,7 +177,7 @@ function Kontak() {
                           rows="5"
                           placeholder="Ceritakan kebutuhan atau pertanyaan Anda"
                           {...register("pesan", {
-                            onChange: resetStatus
+                            onChange: resetStatus,
                           })}
                         ></textarea>
                         {errors.pesan && (
@@ -220,16 +186,31 @@ function Kontak() {
                           </small>
                         )}
                       </div>
-                      <div className="col-12">
-                        <button
-                          type="submit"
-                          className="btn btn-primary mb-4"
-                          disabled={isSubmitting}
-                        >
-                          {isSubmitting ? "mengirim..." : "Kirim Pesan"}
-                          {!isSubmitting && <i className="bi bi-send ms-2"></i>}
-                        </button>
-                         {berhasil && (
+                      <div className="col-12 gap-3">
+                        <div className="d-flex align-item-center gap-3">
+                          <div>
+                            <button
+                              type="submit"
+                              className="btn btn-primary mb-4"
+                              disabled={isSubmitting}
+                            >
+                              {isSubmitting ? "mengirim..." : "Kirim Pesan"}
+                              {!isSubmitting && (
+                                <i className="bi bi-send ms-2"></i>
+                              )}
+                            </button>
+                          </div>
+                          <div>
+                            <button
+                              type="button"
+                              className="btn btn-outline-secondary text-dark"
+                              onClick={batalForm}
+                            >
+                              Batal
+                            </button>
+                          </div>
+                        </div>
+                        {berhasil && (
                           <div className="text-success">
                             Berhasil mengirim pesan!!
                           </div>
