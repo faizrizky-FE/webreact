@@ -6,25 +6,24 @@ import Tentang from "./pages/tentang";
 import Kontak from "./pages/kontak";
 import SolarCursor from "./components/efekCursor";
 import Profile from "./pages/profile";
-import { ProdukProvider } from "./context/ProdukContext";
+import Keranjang from "./pages/keranjang";
 
 function App() {
   return (
     <>
-      <ProdukProvider>
-        <SolarCursor />
-        <Navbar />
+      <SolarCursor />
+      <Navbar />
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/produk" element={<Produk />} />
-          <Route path="/tentang" element={<Tentang />} />
-          <Route path="/kontak" element={<Kontak />} />
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/produk" element={<Produk />} />
+        <Route path="/tentang" element={<Tentang />} />
+        <Route path="/kontak" element={<Kontak />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/keranjang" element={<Keranjang />} />
+      </Routes>
 
-        <Footer />
-      </ProdukProvider>
+      <Footer />
     </>
   );
 }

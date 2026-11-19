@@ -1,5 +1,4 @@
 import { useState } from "react";
-import products from "../data/produk";
 import useFormValidasi from "../hooks/useFormValidasi";
 import { profileSchema, produkSchema } from "../utils/validasiForm";
 import { useProduk } from "../context/ProdukContext";
@@ -61,8 +60,8 @@ function Profile() {
   } = useFormValidasi(produkSchema, simpanProduk);
 
   return (
-    <main className="bg-secondary bg-opacity-10 pb-5 py-5 my-3">
-      <div className="container px-0">
+    <main className="bg-secondary bg-opacity-10 pb-4">
+      <div className="container px-0 py-5 mt-3">
         <section className="d-flex align-item-center gap-3 mb-5">
           <div className="mt-2">
             <i
@@ -258,13 +257,23 @@ function Profile() {
                 </div>
               </div>
               <div className="mb-5">
-                <div className="row row-cols-1 row-cols-md-4 g-3 mx-4">
-                  {produkSaya.length === 0 ? (
-                    <p className="text-secondary text-center py-5">
-                      Kamu belum menambahkan produk.
+                {produkSaya.length === 0 ? (
+                  <div className="text-center pt-5 pb-3">
+                    <i class="bi bi-box fs-1 "></i>
+                    <p className="lh-1 fw-bold">
+                      Kamu belum menambahkan produk
                     </p>
-                  ) : (
-                    produkSaya.map((product) => (
+                    <p>
+                      silahkan tambahkan produk terlebih dahulu untuk
+                      menampilkannya disini.
+                    </p>
+                    <span className="badge rounded-pill bg-primary-subtle text-primary px-3 py-2">
+                      Belum ada Produk
+                    </span>
+                  </div>
+                ) : (
+                  produkSaya.map((product) => (
+                    <div className="row row-cols-12 row-cols-md-4 g-3 mx-4">
                       <div className="col" key={product.id}>
                         <div className="card h-100 rounded-4">
                           <div className="card-body">
@@ -311,9 +320,9 @@ function Profile() {
                           </div>
                         </div>
                       </div>
-                    ))
-                  )}
-                </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

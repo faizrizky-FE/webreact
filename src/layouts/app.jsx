@@ -67,7 +67,7 @@ export function Navbar() {
               aria-label="Search"
             />
           </form>
-          <NavLink to="" className="mx-3 fs-4 text-dark">
+          <NavLink to="/keranjang" className="mx-3 fs-4 text-dark">
             <i className="bi bi-cart3"></i>
           </NavLink>
         </div>
@@ -78,7 +78,7 @@ export function Navbar() {
 
 export function Footer() {
   return (
-    <footer className="bg-light border-top mt-5 pt-5 pb-3">
+    <footer className="bg-light border-top pt-5 pb-3">
       <div className="container">
         <div className="row g-4 mb-4">
           {/* Informasi toko */}
