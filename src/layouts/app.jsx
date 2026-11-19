@@ -1,14 +1,38 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useProduk } from "../context/ProdukContext";
 
-export function Navbar() {
+export function Navbar({
+  search,
+  setSearch,
+  onSearch,
+  tampilSaran,
+  setTampilSaran,
+}) {
+
+  const { produk, produkSaya } = useProduk();
+  const navigate = useNavigate();
+
+  const semuaProduk = [...produk, ...produkSaya];
+  const saranKategori = [
+    "Smartphone",
+    "Handphone",
+    "Laptop",
+    "Tablet",
+    "Aksesoris",
+  ];
+  const hasilSaranKategori = saranKategori.filter((kategori) =>
+    kategori.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const saranProduk = semuaProduk
+    .filter((item) => item.nama.toLowerCase().includes(search.toLowerCase()))
+    .slice(0, 5);
+
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top border-bottom">
       <div className="container px-0">
-        <Link
-          className="navbar-brand"
-          style={{ fontSize: "25px" }}
-          to="/"
-        >
+        <Link className="navbar-brand" style={{ fontSize: "25px" }} to="/">
           <i className="bi bi-bag text-primary"></i>
           <b>
             <span className="text-primary"> Izz</span>Shop
@@ -59,14 +83,52 @@ export function Navbar() {
           >
             <i className="bi bi-person"></i>
           </NavLink>
-          <form className="d-flex" role="search">
-            <input
-              className="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-          </form>
+          <div className="position-relative">
+            <form className="d-flex" role="search" onSubmit={onSearch}>
+              <input
+                className="form-control me-2"
+                type="search"
+                placeholder="Search"
+                aria-label="Search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => setTampilSaran(true)}
+              />
+            </form>
+
+            {tampilSaran && search.trim() !== "" && (
+              <div className="position-absolute top-100 start-0 w-100 bg-white border rounded shadow-sm">
+                {hasilSaranKategori.map((kategori) => (
+                  <button
+                    key={kategori}
+                    type="button"
+                    className="w-100 text-start p-2 border-0 border-bottom bg-white"
+                    onClick={() => {
+                      setSearch(kategori);
+                      setTampilSaran(false);
+                      navigate("/produk");
+                    }}
+                  >
+                    {kategori}
+                  </button>
+                ))}
+                {saranProduk.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className="w-100 text-start p-2 border-0 border-bottom bg-white"
+                    onClick={() => {
+                      setSearch(item.nama);
+                      setTampilSaran(false);
+                      navigate("/produk");
+                    }}
+                  >
+                    {item.nama}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <NavLink to="/keranjang" className="mx-3 fs-4 text-dark">
             <i className="bi bi-cart3"></i>
           </NavLink>

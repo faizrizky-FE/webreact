@@ -2,44 +2,59 @@ import { useState } from "react";
 import { useProduk } from "../context/ProdukContext";
 import { useKeranjang } from "../context/KeranjangContext";
 
-function Produk() {
+function Produk({ search }) {
   const { produk, produkSaya } = useProduk();
   const { setKeranjang } = useKeranjang();
 
   const semuaProduk = [...produk, ...produkSaya];
+  const kataKunciKategori = {
+    hp: "smartphones",
+    handphone: "smartphones",
+    smartphone: "smartphones",
+    laptop: "laptops",
+    tablet: "tablets",
+    aksesoris: "mobile-accessories",
+  };
+  const kata = search.toLowerCase().trim();
+  const kategoriDicari = kataKunciKategori[kata];
+  const hasilPencarian = semuaProduk.filter((item) => {
+    const cocokNama = item.nama.toLowerCase().includes(kata);
+    const cocokKategori = kategoriDicari && item.kategori === kategoriDicari;
+
+    return cocokNama || cocokKategori;
+  });
+
   const [jumlahProduk, setJumlahProduk] = useState(8);
   const [produkDipilih, setProdukDipilih] = useState(null);
   const [tampilDetail, setTampilDetail] = useState(false);
   const [jumlahBeli, setJumlahBeli] = useState(1);
 
   const tambahKeKeranjang = () => {
-  setKeranjang((prev) => {
-    const produkAda = prev.find(
-      (item) => item.id === produkDipilih.id,
-    );
+    setKeranjang((prev) => {
+      const produkAda = prev.find((item) => item.id === produkDipilih.id);
 
-    if (produkAda) {
-      return prev.map((item) =>
-        item.id === produkDipilih.id
-          ? { ...item, jumlah: item.jumlah + jumlahBeli }
-          : item,
-      );
-    }
+      if (produkAda) {
+        return prev.map((item) =>
+          item.id === produkDipilih.id
+            ? { ...item, jumlah: item.jumlah + jumlahBeli }
+            : item,
+        );
+      }
 
-    return [...prev, { ...produkDipilih, jumlah: jumlahBeli }];
-  });
+      return [...prev, { ...produkDipilih, jumlah: jumlahBeli }];
+    });
 
-  setTampilDetail(false);
-};
+    setTampilDetail(false);
+  };
 
   return (
-    <main className="py-5 my-5">
+    <main className="py-5 my-5" id="daftar-produk">
       <section>
         <div className="container px-0">
           <h1>Semua Produk</h1>
           <p>Temukan produk pilihan untuk kebutuhan Anda</p>
           <p className="text-secondary">
-            Menampilkan {semuaProduk.length} produk
+            Menampilkan {hasilPencarian.length} produk
           </p>
         </div>
       </section>
@@ -272,66 +287,77 @@ function Produk() {
       <section>
         <div className="container px-0 pt-3 pb-5">
           <div className="row row-cols-1 row-cols-md-4 g-4">
-            {semuaProduk.slice(0, jumlahProduk).map((product) => (
-              <div className="col" key={product.id}>
-                <div
-                  className="card h-100 shadow-sm rounded-1 border-0 overflow-hidden rounded-4"
-                  onClick={() => {
-                    setProdukDipilih(product);
-                    setJumlahBeli(1);
-                    setTampilDetail(true);
-                  }}
-                  style={{ cursor: "pointer" }}
-                >
+            {hasilPencarian.length === 0 ? (
+              <div className="col-12 text-center py-5">
+                <i className="bi bi-search fs-1 text-secondary"></i>
+                <h5 className="mt-3">Produk tidak ditemukan</h5>
+                <p className="text-secondary">
+                  Coba gunakan kata kunci lainnya.
+                </p>
+              </div>
+            ) : (
+              hasilPencarian.slice(0, jumlahProduk).map((product) => (
+                <div className="col" key={product.id}>
                   <div
-                    className="d-flex justify-content-center align-items-center py-4 position-relative"
-                    style={{ backgroundColor: "#ecf4ffaf" }}
+                    className="card h-100 shadow-sm rounded-1 border-0 overflow-hidden rounded-4"
+                    onClick={() => {
+                      setProdukDipilih(product);
+                      setJumlahBeli(1);
+                      setTampilDetail(true);
+                    }}
+                    style={{ cursor: "pointer" }}
                   >
-                    <img
-                      src={product.gambar}
-                      alt={product.nama}
-                      className="img-fluid"
-                      style={{ height: "180px", objectFit: "contain" }}
-                      onError={(e) => {
-                        e.target.src = "/gambar-default.png";
-                      }}
-                    />
-                    <button
-                      className="btn btn-light rounded-circle position-absolute top-0 end-0 m-2"
-                      type="button"
-                    >
-                      <i className="bi bi-heart text-secondary"></i>
-                    </button>
-                  </div>
-                  <div className="card-body">
-                    <h6 className="card-title fw-bold">
-                      {product.nama.split(" ").length > 3
-                        ? product.nama.split(" ").slice(0, 3).join(" ") + " ..."
-                        : product.nama}
-                    </h6>
                     <div
-                      className="text-secondary overflow-auto mb-3"
-                      style={{ height: "80px" }}
+                      className="d-flex justify-content-center align-items-center py-4 position-relative"
+                      style={{ backgroundColor: "#ecf4ffaf" }}
                     >
-                      {product.deskripsi}
+                      <img
+                        src={product.gambar}
+                        alt={product.nama}
+                        className="img-fluid"
+                        style={{ height: "180px", objectFit: "contain" }}
+                        onError={(e) => {
+                          e.target.src = "/gambar-default.png";
+                        }}
+                      />
+                      <button
+                        className="btn btn-light rounded-circle position-absolute top-0 end-0 m-2"
+                        type="button"
+                      >
+                        <i className="bi bi-heart text-secondary"></i>
+                      </button>
                     </div>
-                    <h6 className="text-primary">
-                      Rp {product.harga.toLocaleString("id-ID")}
-                    </h6>
-                    <button className="btn btn-primary w-100">
-                      <i className="bi bi-cart-plus mx-2"></i> Beli Sekarang
-                    </button>
+                    <div className="card-body">
+                      <h6 className="card-title fw-bold">
+                        {product.nama.split(" ").length > 3
+                          ? product.nama.split(" ").slice(0, 3).join(" ") +
+                            " ..."
+                          : product.nama}
+                      </h6>
+                      <div
+                        className="text-secondary overflow-auto mb-3"
+                        style={{ height: "80px" }}
+                      >
+                        {product.deskripsi}
+                      </div>
+                      <h6 className="text-primary">
+                        Rp {product.harga.toLocaleString("id-ID")}
+                      </h6>
+                      <button className="btn btn-primary w-100">
+                        <i className="bi bi-cart-plus mx-2"></i> Beli Sekarang
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
-        {jumlahProduk < semuaProduk.length && (
+        {jumlahProduk < hasilPencarian.length && (
           <div className="text-center pb-5">
             <p
               className="btn btn-text text-secondary"
-              onClick={() => setJumlahProduk(semuaProduk.length)}
+              onClick={() => setJumlahProduk(hasilPencarian.length)}
             >
               — Lihat Lebih Banyak —
             </p>
@@ -447,7 +473,11 @@ function Produk() {
                         Batal
                       </button>
 
-                      <button className="btn btn-primary" type="button" onClick={tambahKeKeranjang}>
+                      <button
+                        className="btn btn-primary"
+                        type="button"
+                        onClick={tambahKeKeranjang}
+                      >
                         <i className="bi bi-cart-plus me-2"></i>
                         Tambah ke Keranjang
                       </button>

@@ -33,6 +33,7 @@ export function ProdukProvider({ children }) {
             deskripsi: product.description,
             harga: product.price,
             gambar: product.thumbnail,
+            kategori: product.category,
           })),
         );
       } catch (error) {
