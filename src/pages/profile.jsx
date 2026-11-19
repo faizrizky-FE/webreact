@@ -259,7 +259,7 @@ function Profile() {
               <div className="mb-5">
                 {produkSaya.length === 0 ? (
                   <div className="text-center pt-5 pb-3">
-                    <i class="bi bi-box fs-1 "></i>
+                    <i className="bi bi-box fs-1 "></i>
                     <p className="lh-1 fw-bold">
                       Kamu belum menambahkan produk
                     </p>

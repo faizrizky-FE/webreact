@@ -3,9 +3,9 @@ import { Link, NavLink } from "react-router-dom";
 export function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top border-bottom">
-      <div className="container-fluid">
+      <div className="container px-0">
         <Link
-          className="navbar-brand mx-5 "
+          className="navbar-brand"
           style={{ fontSize: "25px" }}
           to="/"
         >
