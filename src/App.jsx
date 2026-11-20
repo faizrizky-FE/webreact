@@ -17,7 +17,13 @@ function App() {
   const handleSearch = (e) => {
     e.preventDefault();
 
-    const kategori = ["Smartphone", "Laptop", "Tablet", "Aksesoris"];
+    const kategori = [
+      "Smartphone",
+      "Handphone",
+      "Laptop",
+      "Tablet",
+      "Aksesoris",
+    ];
     const kata = search.toLowerCase().trim();
     const hasil = kategori.find((item) => item.toLowerCase().startsWith(kata));
     setTampilSaran(false);

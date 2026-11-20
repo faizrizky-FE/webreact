@@ -33,7 +33,15 @@ export function ProdukProvider({ children }) {
             deskripsi: product.description,
             harga: product.price,
             gambar: product.thumbnail,
+            gambarLain: product.images,
             kategori: product.category,
+            brand: product.brand,
+            diskon: product.discountPercentage,
+            rating: product.rating,
+            ulasan: product.reviews,
+            stok: product.stock,
+            statusStok: product.availabilityStatus,
+            tags: product.tags,
           })),
         );
       } catch (error) {
