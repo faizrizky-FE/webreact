@@ -8,6 +8,7 @@ import Kontak from "./pages/kontak";
 import SolarCursor from "./components/efekCursor";
 import Profile from "./pages/profile";
 import Keranjang from "./pages/keranjang";
+import Wishlist from "./pages/whishlist";
 
 function App() {
   const [search, setSearch] = useState("");
@@ -53,6 +54,7 @@ function App() {
         <Route path="/kontak" element={<Kontak />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/keranjang" element={<Keranjang />} />
+        <Route path="/wishlist" element={<Wishlist />} />
       </Routes>
 
       <Footer />

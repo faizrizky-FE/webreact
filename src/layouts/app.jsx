@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useProduk } from "../context/ProdukContext";
+import { useState } from "react";
 
 export function Navbar({
   search,
@@ -8,11 +9,13 @@ export function Navbar({
   tampilSaran,
   setTampilSaran,
 }) {
-
   const { produk, produkSaya } = useProduk();
   const navigate = useNavigate();
 
+  const [bukaPencarian, setBukaPencarian] = useState(false);
+
   const semuaProduk = [...produk, ...produkSaya];
+
   const saranKategori = [
     "Smartphone",
     "Handphone",
@@ -20,6 +23,7 @@ export function Navbar({
     "Tablet",
     "Aksesoris",
   ];
+
   const hasilSaranKategori = saranKategori.filter((kategori) =>
     kategori.toLowerCase().includes(search.toLowerCase()),
   );
@@ -28,15 +32,33 @@ export function Navbar({
     .filter((item) => item.nama.toLowerCase().includes(search.toLowerCase()))
     .slice(0, 5);
 
+  const pilihSaran = (kata) => {
+    setSearch(kata);
+    setTampilSaran(false);
+    setBukaPencarian(false);
+    navigate("/produk");
+  };
+
+  const tutupPencarian = () => {
+    setBukaPencarian(false);
+    setTampilSaran(false);
+    setSearch("");
+  };
+
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top border-bottom">
-      <div className="container px-0">
-        <Link className="navbar-brand" style={{ fontSize: "25px" }} to="/">
-          <i className="bi bi-bag text-primary"></i>
-          <b>
-            <span className="text-primary"> Izz</span>Shop
-          </b>
+    <nav className="navbar navbar-expand-lg bg-body-tertiary fixed-top border-bottom shadow-sm">
+      <div className="container">
+        {/* Logo */}
+        <Link
+          className="navbar-brand fw-bold fs-4"
+          to="/"
+          onClick={tutupPencarian}
+        >
+          <i className="bi bi-bag text-primary me-1"></i>
+          <span className="text-primary">Izz</span>Shop
         </Link>
+
+        {/* Toggle Mobile */}
         <button
           className="navbar-toggler"
           type="button"
@@ -48,89 +70,138 @@ export function Navbar({
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-        <div
-          className="collapse navbar-collapse justify-content-center"
-          id="navbarSupportedContent"
-        >
-          <ul className="navbar-nav text-center mx-auto mb-2 mb-lg-0">
+
+        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          {/* Menu */}
+          <ul className="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-2 text-center">
             <li className="nav-item">
-              <NavLink className="nav-link" aria-current="page" to="/">
+              <NavLink className="nav-link" to="/">
                 Home
               </NavLink>
             </li>
+
             <li className="nav-item">
-              <NavLink className="nav-link" aria-current="page" to="/produk">
+              <NavLink className="nav-link" to="/produk">
                 Produk
               </NavLink>
             </li>
+
             <li className="nav-item">
-              <NavLink className="nav-link" aria-current="page" to="/tentang">
+              <NavLink className="nav-link" to="/tentang">
                 Tentang
               </NavLink>
             </li>
+
             <li className="nav-item">
-              <NavLink className="nav-link" aria-current="page" to="/kontak">
+              <NavLink className="nav-link" to="/kontak">
                 Kontak
               </NavLink>
             </li>
           </ul>
 
-          <NavLink
-            to="/profile"
-            className="mx-2 pb-1 fs-4 text-dark bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
-            style={{ width: "40px", height: "40px" }}
-          >
-            <i className="bi bi-person"></i>
-          </NavLink>
-          <div className="position-relative">
-            <form className="d-flex" role="search" onSubmit={onSearch}>
-              <input
-                className="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onFocus={() => setTampilSaran(true)}
-              />
-            </form>
+          {/* Action */}
+          <div className="d-flex align-items-center justify-content-center gap-2">
+            {/* Pencarian */}
+            <div className="position-relative d-flex align-items-center gap-2">
+              <form
+                onSubmit={onSearch}
+                role="search"
+                className="d-flex align-items-center"
+              >
+                <input
+                  type="search"
+                  className="form-control rounded-pill"
+                  placeholder="Cari produk..."
+                  aria-label="Cari produk"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  onFocus={() => setTampilSaran(true)}
+                  style={{
+                    width: bukaPencarian ? "220px" : "0px",
+                    opacity: bukaPencarian ? 1 : 0,
+                    padding: bukaPencarian ? "0.375rem 0.75rem" : 0,
+                    border: bukaPencarian ? undefined : 0,
+                    transition: "all 0.3s ease",
+                    pointerEvents: bukaPencarian ? "auto" : "none",
+                  }}
+                />
+              </form>
 
-            {tampilSaran && search.trim() !== "" && (
-              <div className="position-absolute top-100 start-0 w-100 bg-white border rounded shadow-sm">
-                {hasilSaranKategori.map((kategori) => (
-                  <button
-                    key={kategori}
-                    type="button"
-                    className="w-100 text-start p-2 border-0 border-bottom bg-white"
-                    onClick={() => {
-                      setSearch(kategori);
-                      setTampilSaran(false);
-                      navigate("/produk");
-                    }}
-                  >
-                    {kategori}
-                  </button>
-                ))}
-                {saranProduk.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className="w-100 text-start p-2 border-0 border-bottom bg-white"
-                    onClick={() => {
-                      setSearch(item.nama);
-                      setTampilSaran(false);
-                      navigate("/produk");
-                    }}
-                  >
-                    {item.nama}
-                  </button>
-                ))}
-              </div>
-            )}
+              <button
+                type="button"
+                className="btn btn-light rounded-circle d-flex align-items-center justify-content-center gap-2"
+                style={{ width: "40px", height: "40px" }}
+                onClick={() => {
+                  if (bukaPencarian) {
+                    tutupPencarian();
+                  } else {
+                    setBukaPencarian(true);
+                  }
+                }}
+                aria-label={
+                  bukaPencarian ? "Tutup pencarian" : "Buka pencarian"
+                }
+              >
+                <i
+                  className={`bi ${bukaPencarian ? "bi-x-lg" : "bi-search"}`}
+                ></i>
+              </button>
+
+              {/* Autocomplete */}
+              {bukaPencarian && tampilSaran && search.trim() !== "" && (
+                <div
+                  className="position-absolute top-100 end-0 bg-white border rounded-3 shadow mt-2 overflow-hidden"
+                  style={{ width: "260px", zIndex: 1050 }}
+                >
+                  {hasilSaranKategori.map((kategori) => (
+                    <button
+                      key={kategori}
+                      type="button"
+                      className="w-100 text-start px-3 py-2 border-0 border-bottom bg-white"
+                      onClick={() => pilihSaran(kategori)}
+                    >
+                      <i className="bi bi-tag me-2 text-secondary"></i>
+                      {kategori}
+                    </button>
+                  ))}
+
+                  {saranProduk.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className="w-100 text-start px-3 py-2 border-0 border-bottom bg-white"
+                      onClick={() => pilihSaran(item.nama)}
+                    >
+                      <i className="bi bi-box-seam me-2 text-secondary"></i>
+                      {item.nama}
+                    </button>
+                  ))}
+
+                  {hasilSaranKategori.length === 0 &&
+                    saranProduk.length === 0 && (
+                      <div className="text-center text-secondary p-3">
+                        Produk tidak ditemukan
+                      </div>
+                    )}
+                </div>
+              )}
+            </div>
+
+            {/* Wishlist */}
+            <NavLink to="/wishlist" className="mx-2 fs-5 text-danger">
+              <i className="bi bi-heart"></i>
+            </NavLink>
+
+            {/* Keranjang */}
+            <NavLink to="/keranjang" className="mx-2 fs-5 text-warning">
+              <i className="bi bi-cart3"></i>
+            </NavLink>
+
+            {/* Profile */}
+            <NavLink to="/profile" className="mx-2 fs-4 text-primary">
+              <i className="bi bi-person-circle"></i>
+            </NavLink>
           </div>
-          <NavLink to="/keranjang" className="mx-3 fs-4 text-dark">
-            <i className="bi bi-cart3"></i>
-          </NavLink>
         </div>
       </div>
     </nav>

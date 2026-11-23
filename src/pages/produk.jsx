@@ -1,24 +1,77 @@
 import { useState, useEffect } from "react";
 import { useProduk } from "../context/ProdukContext";
 import { useKeranjang } from "../context/KeranjangContext";
+import { useLocation } from "react-router-dom";
+import { useWishlist } from "../context/WishlistContext";
+
+const filterAwal = {
+  kategori: [],
+  hargaMin: "",
+  hargaMax: "",
+  rating: [],
+  ketersediaan: [],
+  brand: [],
+};
+
+const daftarKategori = [
+  { nilai: "smartphones", label: "Smartphone" },
+  { nilai: "laptops", label: "Laptop" },
+  { nilai: "tablets", label: "Tablet" },
+  { nilai: "mobile-accessories", label: "Aksesoris" },
+];
 
 function Produk({ search }) {
+  const { search: locationSearch } = useLocation();
+  const kategoriUrl = new URLSearchParams(locationSearch).get("kategori");
   const { produk, produkSaya } = useProduk();
   const { setKeranjang } = useKeranjang();
+  const { wishlist, setWishlist } = useWishlist();
 
   const semuaProduk = [...produk, ...produkSaya];
+  const toggleWishlist = (product) => {
+    setWishlist((prev) => {
+      const sudahAda = prev.some(
+        (item) => item.id === product.id && item.nama === product.nama,
+      );
 
-  const [jumlahProduk, setJumlahProduk] = useState(8);
+      return sudahAda
+        ? prev.filter(
+            (item) => item.id !== product.id || item.nama !== product.nama,
+          )
+        : [...prev, product];
+    });
+  };
+  const daftarBrand = [
+    ...new Set(semuaProduk.map((item) => item.brand).filter(Boolean)),
+  ];
+
+  const [halamanAktif, setHalamanAktif] = useState(1);
+  const [nomorAwal, setNomorAwal] = useState(1);
+  const produkPerHalaman = 12;
+  const [urutkan, setUrutkan] = useState("");
   const [produkDipilih, setProdukDipilih] = useState(null);
-  const [tampilDetail, setTampilDetail] = useState(false);
   const [jumlahBeli, setJumlahBeli] = useState(1);
   const [gambarAktif, setGambarAktif] = useState("");
-  const [kategoriDipilih, setKategoriDipilih] = useState([]);
-  const [kategoriAktif, setKategoriAktif] = useState([]);
-  const [hargaMin, setHargaMin] = useState("");
-  const [hargaMax, setHargaMax] = useState("");
-  const [hargaMinAktif, setHargaMinAktif] = useState("");
-  const [hargaMaxAktif, setHargaMaxAktif] = useState("");
+  const [filterDraft, setFilterDraft] = useState(filterAwal);
+  const [filterAktif, setFilterAktif] = useState(filterAwal);
+
+  useEffect(() => {
+    const kategoriValid = daftarKategori.some(
+      (item) => item.nilai === kategoriUrl,
+    );
+
+    const filterBaru = {
+      ...filterAwal,
+      kategori: kategoriValid ? [kategoriUrl] : [],
+    };
+
+    setFilterDraft(filterBaru);
+    setFilterAktif(filterBaru);
+    setCariBrand("");
+  }, [kategoriUrl]);
+
+  const [cariBrand, setCariBrand] = useState("");
+  const [tampilSaranBrand, setTampilSaranBrand] = useState(false);
 
   const kataKunciKategori = {
     hp: "smartphones",
@@ -28,27 +81,69 @@ function Produk({ search }) {
     tablet: "tablets",
     aksesoris: "mobile-accessories",
   };
+
   const kata = search.toLowerCase().trim();
   const kategoriDicari = kataKunciKategori[kata];
-  const hasilPencarian = semuaProduk.filter((item) => {
+
+  const hasilFilter = semuaProduk.filter((item) => {
     const cocokNama = item.nama.toLowerCase().includes(kata);
     const cocokKategori = kategoriDicari && item.kategori === kategoriDicari;
+    if (!cocokNama && !cocokKategori) return false;
+    if (
+      filterAktif.kategori.length > 0 &&
+      !filterAktif.kategori.includes(item.kategori)
+    )
+      return false;
 
-    return cocokNama || cocokKategori;
-  });
-
-  const hasilFilterKategori =
-    kategoriAktif.length === 0
-      ? hasilPencarian
-      : hasilPencarian.filter((item) => kategoriAktif.includes(item.kategori));
-
-  const hasilFilterHarga = hasilFilterKategori.filter((item) => {
     const harga = Number(item.harga);
-    const min = hargaMinAktif === "" ? 0 : Number(hargaMinAktif);
-    const max = hargaMaxAktif === "" ? Infinity : Number(hargaMaxAktif);
+    const min = filterAktif.hargaMin === "" ? 0 : Number(filterAktif.hargaMin);
+    const max =
+      filterAktif.hargaMax === "" ? Infinity : Number(filterAktif.hargaMax);
+    if (harga < min || harga > max) return false;
+    if (
+      filterAktif.rating.length > 0 &&
+      !filterAktif.rating.some((nilai) => (Number(item.rating) || 0) >= nilai)
+    )
+      return false;
 
-    return harga >= min && harga <= max;
+    const stok = Number(item.stok) || 0;
+    if (
+      filterAktif.ketersediaan.length > 0 &&
+      !filterAktif.ketersediaan.some((status) =>
+        status === "tersedia" ? stok > 0 : stok <= 0,
+      )
+    )
+      return false;
+
+    if (filterAktif.brand.length > 0 && !filterAktif.brand.includes(item.brand))
+      return false;
+
+    return true;
   });
+
+  hasilFilter.sort((a, b) => {
+    if (urutkan === "termurah") return a.harga - b.harga;
+    if (urutkan === "termahal") return b.harga - a.harga;
+    if (urutkan === "terbaru") return b.id - a.id;
+
+    return 0;
+  });
+
+  const totalHalaman = Math.ceil(hasilFilter.length / produkPerHalaman);
+  const nomorAkhir = Math.min(nomorAwal + 2, totalHalaman);
+  const produkDitampilkan = hasilFilter.slice(
+    (halamanAktif - 1) * produkPerHalaman,
+    halamanAktif * produkPerHalaman,
+  );
+
+  const toggleKategori = (nilai, dicentang) => {
+    setFilterDraft((prev) => ({
+      ...prev,
+      kategori: dicentang
+        ? [...prev.kategori, nilai]
+        : prev.kategori.filter((k) => k !== nilai),
+    }));
+  };
 
   const tambahKeKeranjang = () => {
     setKeranjang((prev) => {
@@ -65,16 +160,36 @@ function Produk({ search }) {
       return [...prev, { ...produkDipilih, jumlah: jumlahBeli }];
     });
 
-    setTampilDetail(false);
+    setProdukDipilih(null);
   };
 
   useEffect(() => {
-    document.body.style.overflow = tampilDetail ? "hidden" : "";
+    document.body.style.overflow = produkDipilih ? "hidden" : "";
 
     return () => {
       document.body.style.overflow = "";
     };
-  }, [tampilDetail]);
+  }, [produkDipilih]);
+
+  useEffect(() => {
+    setHalamanAktif(1);
+    setNomorAwal(1);
+  }, [search, filterAktif, urutkan]);
+
+  useEffect(() => {
+    if (halamanAktif > nomorAwal + 2) {
+      setNomorAwal(halamanAktif - 2);
+    } else if (halamanAktif < nomorAwal) {
+      setNomorAwal(halamanAktif);
+    }
+  }, [halamanAktif, nomorAwal]);
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [halamanAktif]);
 
   return (
     <main className="py-5 my-5" id="daftar-produk">
@@ -83,7 +198,7 @@ function Produk({ search }) {
           <h1>Semua Produk</h1>
           <p>Temukan produk pilihan untuk kebutuhan Anda</p>
           <p className="text-secondary">
-            Menampilkan {hasilFilterHarga.length} produk
+            Menampilkan {hasilFilter.length} produk
           </p>
         </div>
       </section>
@@ -91,7 +206,6 @@ function Produk({ search }) {
       <section>
         <div className="container px-0">
           <div className="d-flex align-items-center justify-content-between">
-            {/* Tombol Filter */}
             <div>
               <button
                 className="btn btn-outline-primary text-dark"
@@ -104,7 +218,6 @@ function Produk({ search }) {
                 Filter Produk
               </button>
 
-              {/* Offcanvas Filter */}
               <div
                 className="offcanvas offcanvas-start"
                 data-bs-scroll="true"
@@ -130,7 +243,6 @@ function Produk({ search }) {
                 </div>
 
                 <div className="offcanvas-body">
-                  {/* Kategori */}
                   <div className="mb-3">
                     <button
                       className="btn w-100 d-flex justify-content-between align-items-center fw-bold px-0"
@@ -148,94 +260,28 @@ function Produk({ search }) {
                     </button>
 
                     <div className="collapse show mt-3" id="Kategori">
-                      <div className="form-check mb-2">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          checked={kategoriDipilih.includes("smartphones")}
-                          onChange={(e) => {
-                            setKategoriDipilih((prev) =>
-                              e.target.checked
-                                ? [...prev, "smartphones"]
-                                : prev.filter((item) => item !== "smartphones"),
-                            );
-                          }}
-                          id="Smartphone"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="Smartphone"
-                        >
-                          Smartphone
-                        </label>
-                      </div>
+                      {daftarKategori.map((k) => (
+                        <div className="form-check mb-2" key={k.nilai}>
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id={k.nilai}
+                            checked={filterDraft.kategori.includes(k.nilai)}
+                            onChange={(e) =>
+                              toggleKategori(k.nilai, e.target.checked)
+                            }
+                          />
 
-                      <div className="form-check mb-2">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          checked={kategoriDipilih.includes("laptops")}
-                          onChange={(e) => {
-                            setKategoriDipilih((prev) =>
-                              e.target.checked
-                                ? [...prev, "laptops"]
-                                : prev.filter((item) => item !== "laptops"),
-                            );
-                          }}
-                          id="Laptop"
-                        />
-                        <label className="form-check-label" htmlFor="Laptop">
-                          Laptop
-                        </label>
-                      </div>
-
-                      <div className="form-check mb-2">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          checked={kategoriDipilih.includes("tablets")}
-                          onChange={(e) => {
-                            setKategoriDipilih((prev) =>
-                              e.target.checked
-                                ? [...prev, "tablets"]
-                                : prev.filter((item) => item !== "tablets"),
-                            );
-                          }}
-                          id="Tablet"
-                        />
-                        <label className="form-check-label" htmlFor="Tablet">
-                          Tablet
-                        </label>
-                      </div>
-
-                      <div className="form-check mb-2">
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          checked={kategoriDipilih.includes(
-                            "mobile-accessories",
-                          )}
-                          onChange={(e) => {
-                            setKategoriDipilih((prev) =>
-                              e.target.checked
-                                ? [...prev, "mobile-accessories"]
-                                : prev.filter(
-                                    (item) => item !== "mobile-accessories",
-                                  ),
-                            );
-                          }}
-                          id="Aksesoris"
-                        />
-                        <label className="form-check-label" htmlFor="Aksesoris">
-                          Aksesoris
-                        </label>
-                      </div>
+                          <label className="form-check-label" htmlFor={k.nilai}>
+                            {k.label}
+                          </label>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
                   <hr />
 
-                  {/* Rentang Harga */}
                   <div className="mb-3">
                     <h6 className="fw-bold mb-3">
                       <i className="bi bi-cash-stack me-2 text-primary"></i>
@@ -246,16 +292,28 @@ function Produk({ search }) {
                       <input
                         type="number"
                         className="form-control form-control-sm"
-                        value={hargaMin}
-                        onChange={(e) => setHargaMin(e.target.value)}
+                        value={filterDraft.hargaMin}
+                        onChange={(e) =>
+                          setFilterDraft((prev) => ({
+                            ...prev,
+                            hargaMin: e.target.value,
+                          }))
+                        }
                         placeholder="Min. harga"
                       />
+
                       <span className="text-secondary">-</span>
+
                       <input
                         type="number"
                         className="form-control form-control-sm"
-                        value={hargaMax}
-                        onChange={(e) => setHargaMax(e.target.value)}
+                        value={filterDraft.hargaMax}
+                        onChange={(e) =>
+                          setFilterDraft((prev) => ({
+                            ...prev,
+                            hargaMax: e.target.value,
+                          }))
+                        }
                         placeholder="Maks. harga"
                       />
                     </div>
@@ -263,7 +321,6 @@ function Produk({ search }) {
 
                   <hr />
 
-                  {/* Rating */}
                   <div className="mb-3">
                     <h6 className="fw-bold mb-3">
                       <i className="bi bi-star me-2 text-primary"></i>
@@ -276,7 +333,19 @@ function Produk({ search }) {
                           className="form-check-input"
                           type="checkbox"
                           id={`rating-${nilai}`}
+                          checked={filterDraft.rating.includes(Number(nilai))}
+                          onChange={(e) =>
+                            setFilterDraft((prev) => ({
+                              ...prev,
+                              rating: e.target.checked
+                                ? [...prev.rating, Number(nilai)]
+                                : prev.rating.filter(
+                                    (r) => r !== Number(nilai),
+                                  ),
+                            }))
+                          }
                         />
+
                         <label
                           className="form-check-label"
                           htmlFor={`rating-${nilai}`}
@@ -295,7 +364,6 @@ function Produk({ search }) {
 
                   <hr />
 
-                  {/* Ketersediaan */}
                   <div className="mb-3">
                     <h6 className="fw-bold mb-3">
                       <i className="bi bi-box-seam me-2 text-primary"></i>
@@ -307,6 +375,17 @@ function Produk({ search }) {
                         className="form-check-input"
                         type="checkbox"
                         id="tersedia"
+                        checked={filterDraft.ketersediaan.includes("tersedia")}
+                        onChange={(e) =>
+                          setFilterDraft((prev) => ({
+                            ...prev,
+                            ketersediaan: e.target.checked
+                              ? [...prev.ketersediaan, "tersedia"]
+                              : prev.ketersediaan.filter(
+                                  (status) => status !== "tersedia",
+                                ),
+                          }))
+                        }
                       />
                       <label className="form-check-label" htmlFor="tersedia">
                         Produk tersedia
@@ -318,6 +397,17 @@ function Produk({ search }) {
                         className="form-check-input"
                         type="checkbox"
                         id="habis"
+                        checked={filterDraft.ketersediaan.includes("habis")}
+                        onChange={(e) =>
+                          setFilterDraft((prev) => ({
+                            ...prev,
+                            ketersediaan: e.target.checked
+                              ? [...prev.ketersediaan, "habis"]
+                              : prev.ketersediaan.filter(
+                                  (status) => status !== "habis",
+                                ),
+                          }))
+                        }
                       />
                       <label className="form-check-label" htmlFor="habis">
                         Stok habis
@@ -327,35 +417,79 @@ function Produk({ search }) {
 
                   <hr />
 
-                  {/* Brand */}
                   <div className="mb-3">
                     <h6 className="fw-bold mb-3">
                       <i className="bi bi-tags me-2 text-primary"></i>
                       Brand
                     </h6>
+                    <div className="position-relative">
+                      <input
+                        type="text"
+                        className="form-control pe-5"
+                        placeholder="Cari brand..."
+                        value={cariBrand}
+                        onChange={(e) => {
+                          setCariBrand(e.target.value);
+                          setTampilSaranBrand(true);
+                          setFilterDraft((prev) => ({
+                            ...prev,
+                            brand: [],
+                          }));
+                        }}
+                        onFocus={() => setTampilSaranBrand(true)}
+                      />
 
-                    <input
-                      type="text"
-                      className="form-control form-control-sm"
-                      placeholder="Cari brand..."
-                    />
-                    <small className="text-secondary d-block mt-2">
-                      Pilihan brand akan ditampilkan di sini.
-                    </small>
+                      {cariBrand && (
+                        <button
+                          type="button"
+                          className="btn-close position-absolute top-50 end-0 translate-middle-y me-3"
+                          onClick={() => {
+                            setCariBrand("");
+                            setFilterDraft((prev) => ({
+                              ...prev,
+                              brand: [],
+                            }));
+                            setTampilSaranBrand(false);
+                          }}
+                        />
+                      )}
+                    </div>
+                    {tampilSaranBrand &&
+                      cariBrand.trim() &&
+                      daftarBrand
+                        .filter((brand) =>
+                          brand.toLowerCase().includes(cariBrand.toLowerCase()),
+                        )
+                        .map((brand) => (
+                          <button
+                            key={brand}
+                            type="button"
+                            className="btn btn-light border w-100 text-start mt-1"
+                            onClick={() => {
+                              setCariBrand(brand);
+                              setFilterDraft((prev) => ({
+                                ...prev,
+                                brand: [brand],
+                              }));
+                              setTampilSaranBrand(false);
+                            }}
+                          >
+                            {brand}
+                          </button>
+                        ))}
                   </div>
 
                   <hr />
 
-                  {/* Tombol Aksi */}
                   <div className="d-flex gap-2">
                     <button
                       type="button"
                       className="btn btn-outline-secondary w-100"
                       onClick={() => {
-                        setKategoriDipilih([]);
-                        setKategoriAktif([]);
-                        setHargaMin("");
-                        setHargaMax("");
+                        setFilterDraft(filterAwal);
+                        setFilterAktif(filterAwal);
+                        setCariBrand("");
+                        setTampilSaranBrand(false);
                       }}
                     >
                       Reset Filter
@@ -364,11 +498,7 @@ function Produk({ search }) {
                     <button
                       type="button"
                       className="btn btn-primary w-100"
-                      onClick={() => {
-                        setKategoriAktif(kategoriDipilih);
-                        setHargaMinAktif(hargaMin);
-                        setHargaMaxAktif(hargaMax);
-                      }}
+                      onClick={() => setFilterAktif(filterDraft)}
                       data-bs-dismiss="offcanvas"
                     >
                       Terapkan
@@ -378,31 +508,35 @@ function Produk({ search }) {
               </div>
             </div>
 
-            {/* Dropdown */}
             <div className="d-flex align-items-center gap-2">
               <select
                 className="form-select border-primary"
-                aria-label="Pilih kategori"
-                defaultValue=""
+                value={filterAktif.kategori[0] || ""}
+                onChange={(e) =>
+                  setFilterAktif((prev) => ({
+                    ...prev,
+                    kategori: e.target.value ? [e.target.value] : [],
+                  }))
+                }
               >
                 <option value="">Semua</option>
-                <option value="Smartphone">Smartphone</option>
-                <option value="Laptop">Laptop</option>
-                <option value="Tablet">Tablet</option>
-                <option value="Aksesoris">Aksesoris</option>
+                <option value="smartphones">Smartphone</option>
+                <option value="laptops">Laptop</option>
+                <option value="tablets">Tablet</option>
+                <option value="mobile-accessories">Aksesoris</option>
               </select>
 
               <select
                 className="form-select border-primary"
+                value={urutkan}
+                onChange={(e) => setUrutkan(e.target.value)}
                 aria-label="Urutkan produk"
                 defaultValue=""
               >
-                <option value="" disabled>
-                  Urutkan
-                </option>
-                <option value="1">Terbaru</option>
-                <option value="2">Termurah</option>
-                <option value="3">Termahal</option>
+                <option value="">Urutkan</option>
+                <option value="terbaru">Terbaru</option>
+                <option value="termurah">Termurah</option>
+                <option value="termahal">Termahal</option>
               </select>
             </div>
           </div>
@@ -412,7 +546,7 @@ function Produk({ search }) {
       <section>
         <div className="container px-0 pt-3 pb-5">
           <div className="row row-cols-1 row-cols-md-4 g-3">
-            {hasilFilterHarga.length === 0 ? (
+            {hasilFilter.length === 0 ? (
               <div className="col-12 text-center py-5">
                 <i className="bi bi-search fs-1 text-secondary"></i>
                 <h5 className="mt-3">Produk tidak ditemukan</h5>
@@ -421,7 +555,7 @@ function Produk({ search }) {
                 </p>
               </div>
             ) : (
-              hasilFilterHarga.slice(0, jumlahProduk).map((product) => {
+              produkDitampilkan.map((product) => {
                 const diskon = product.diskon || 0;
                 const stok = product.stok ?? 0;
 
@@ -437,14 +571,12 @@ function Produk({ search }) {
                         setProdukDipilih(product);
                         setGambarAktif(product.gambar);
                         setJumlahBeli(1);
-                        setTampilDetail(true);
                       }}
                       style={{
                         cursor: "pointer",
                         transition: "all 0.2s ease",
                       }}
                     >
-                      {/* Gambar Produk */}
                       <div
                         className="position-relative d-flex justify-content-center align-items-center p-3"
                         style={{
@@ -474,15 +606,27 @@ function Produk({ search }) {
 
                         <button
                           type="button"
-                          className="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm"
+                          className="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm d-flex align-items-center justify-content-center"
                           style={{ width: "35px", height: "35px" }}
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleWishlist(product);
+                          }}
                         >
-                          <i className="bi bi-heart text-secondary"></i>
+                          <i
+                            className={`bi ${
+                              wishlist.some(
+                                (item) =>
+                                  item.id === product.id &&
+                                  item.nama === product.nama,
+                              )
+                                ? "bi-heart-fill text-danger"
+                                : "bi-heart text-secondary"
+                            } pt-1`}
+                          ></i>
                         </button>
                       </div>
 
-                      {/* Informasi Produk */}
                       <div className="card-body p-3 d-flex flex-column">
                         <span
                           className="text-secondary mb-1"
@@ -502,7 +646,6 @@ function Produk({ search }) {
                           {product.nama.split(" ").length > 3 && "..."}
                         </h6>
 
-                        {/* Rating */}
                         <div className="d-flex align-items-center gap-1 mb-3">
                           <i
                             className="bi bi-star-fill"
@@ -520,7 +663,6 @@ function Produk({ search }) {
                           </span>
                         </div>
 
-                        {/* Harga */}
                         <div className="mt-auto">
                           <h6
                             className="fw-bold mb-2"
@@ -529,7 +671,6 @@ function Produk({ search }) {
                             Rp {hargaAkhir.toLocaleString("id-ID")}
                           </h6>
 
-                          {/* Status Stok */}
                           <div className="d-flex align-items-center justify-content-between">
                             <span
                               className={`small ${
@@ -563,21 +704,55 @@ function Produk({ search }) {
             )}
           </div>
         </div>
+        {totalHalaman > 1 && (
+          <nav className="d-flex justify-content-center pb-5">
+            <ul className="pagination mb-0">
+              <li
+                className={`page-item ${halamanAktif === 1 ? "disabled" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => setHalamanAktif((prev) => prev - 1)}
+                  disabled={halamanAktif === 1}
+                >
+                  <i className="bi bi-chevron-left"></i>
+                </button>
+              </li>
 
-        {jumlahProduk < hasilFilterHarga.length && (
-          <div className="text-center pb-5">
-            <p
-              className="btn btn-text text-secondary"
-              onClick={() => setJumlahProduk(hasilFilterHarga.length)}
-            >
-              — Lihat Lebih Banyak —
-            </p>
-          </div>
+              {Array.from(
+                { length: nomorAkhir - nomorAwal + 1 },
+                (_, i) => nomorAwal + i,
+              ).map((halaman) => (
+                <li
+                  key={halaman}
+                  className={`page-item ${halamanAktif === halaman ? "active" : ""}`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => setHalamanAktif(halaman)}
+                  >
+                    {halaman}
+                  </button>
+                </li>
+              ))}
+
+              <li
+                className={`page-item ${halamanAktif === totalHalaman ? "disabled" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => setHalamanAktif((prev) => prev + 1)}
+                  disabled={halamanAktif === totalHalaman}
+                >
+                  <i className="bi bi-chevron-right"></i>
+                </button>
+              </li>
+            </ul>
+          </nav>
         )}
       </section>
 
-      {tampilDetail &&
-        produkDipilih &&
+      {produkDipilih &&
         (() => {
           const diskon = produkDipilih.diskon || 0;
           const hargaAkhir = Math.round(
@@ -597,11 +772,12 @@ function Produk({ search }) {
                   <button
                     className="btn btn-light rounded-circle position-absolute top-0 end-0 m-3 shadow-sm me-4"
                     type="button"
-                    onClick={() => setTampilDetail(false)}
+                    onClick={() => setProdukDipilih(null)}
                     style={{ zIndex: 20 }}
                   >
                     <i className="bi bi-x-lg"></i>
                   </button>
+
                   <div
                     className="modal-body p-0"
                     style={{
@@ -610,7 +786,6 @@ function Produk({ search }) {
                       overflowX: "hidden",
                     }}
                   >
-                    {/* Gambar Produk */}
                     <div
                       className="position-relative d-flex align-items-center justify-content-center p-4"
                       style={{
@@ -619,11 +794,22 @@ function Produk({ search }) {
                       }}
                     >
                       <button
-                        className="btn btn-light rounded-circle position-absolute top-0 start-0 m-3 shadow-sm"
                         type="button"
-                        style={{ zIndex: 2 }}
+                        className="btn btn-light rounded-circle position-absolute top-0 end-0 m-2 shadow-sm d-flex align-items-center justify-content-center"
+                        style={{ width: "35px", height: "35px" }}
+                        onClick={() => toggleWishlist(produkDipilih)}
                       >
-                        <i className="bi bi-heart text-secondary fs-5"></i>
+                        <i
+                          className={`bi ${
+                            wishlist.some(
+                              (item) =>
+                                item.id === produkDipilih.id &&
+                                item.nama === produkDipilih.nama,
+                            )
+                              ? "bi-heart-fill text-danger"
+                              : "bi-heart text-secondary"
+                          } pt-1`}
+                        ></i>
                       </button>
 
                       {diskon > 0 && (
@@ -642,6 +828,7 @@ function Produk({ search }) {
                           objectFit: "contain",
                         }}
                       />
+
                       <div className="d-flex justify-content-center gap-2 mt-3">
                         {produkDipilih.gambarLain?.map((gambar, index) => (
                           <button
@@ -666,9 +853,7 @@ function Produk({ search }) {
                       </div>
                     </div>
 
-                    {/* Informasi Produk */}
                     <div className="p-4 p-md-5">
-                      {/* Nama dan Rating */}
                       <div className="mb-4">
                         <span className="badge bg-primary bg-opacity-10 text-primary mb-2">
                           {produkDipilih.kategori || "Produk"}
@@ -688,7 +873,6 @@ function Produk({ search }) {
                         </div>
                       </div>
 
-                      {/* Harga */}
                       <div
                         className="rounded-3 p-3 mb-4"
                         style={{ backgroundColor: "#fff5f2" }}
@@ -718,7 +902,6 @@ function Produk({ search }) {
                         </div>
                       </div>
 
-                      {/* Deskripsi */}
                       <div className="mb-4">
                         <h6 className="fw-bold mb-2">Deskripsi Produk</h6>
                         <p className="text-secondary small mb-0 text-break">
@@ -726,11 +909,9 @@ function Produk({ search }) {
                         </p>
                       </div>
 
-                      {/* Ulasan Produk */}
                       <div className="mb-4">
                         <div className="d-flex justify-content-between align-items-center mb-3">
                           <h6 className="fw-bold mb-0">Ulasan Pembeli</h6>
-
                           <span className="text-secondary small">
                             {produkDipilih.ulasan?.length || 0} ulasan
                           </span>
@@ -740,7 +921,6 @@ function Produk({ search }) {
                           <div className="d-flex flex-column gap-3">
                             {produkDipilih.ulasan.map((review, index) => (
                               <div key={index} className="border rounded-3 p-3">
-                                {/* Nama dan Rating */}
                                 <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
                                   <div>
                                     <h6 className="fw-semibold small mb-1">
@@ -775,7 +955,6 @@ function Produk({ search }) {
                                   </span>
                                 </div>
 
-                                {/* Komentar */}
                                 <p className="text-secondary small mb-0 mt-3">
                                   {review.comment}
                                 </p>
@@ -794,7 +973,6 @@ function Produk({ search }) {
 
                       <hr className="my-4" />
 
-                      {/* Informasi Produk */}
                       <h6 className="fw-bold mb-3">Informasi Produk</h6>
 
                       <div className="row g-3 mb-4">
@@ -820,7 +998,6 @@ function Produk({ search }) {
 
                       <hr className="my-4" />
 
-                      {/* Jumlah Pembelian */}
                       <div className="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
                         <div>
                           <h6 className="fw-bold mb-1">Jumlah Pembelian</h6>
@@ -861,7 +1038,6 @@ function Produk({ search }) {
                         </div>
                       </div>
 
-                      {/* Subtotal */}
                       <div className="d-flex justify-content-between align-items-center p-3 rounded-3 bg-light mb-4">
                         <span className="fw-semibold">Total Pembelian</span>
                         <h5
@@ -874,12 +1050,11 @@ function Produk({ search }) {
 
                       <hr className="my-4" />
 
-                      {/* Tombol Aksi */}
                       <div className="d-flex gap-2">
                         <button
                           className="btn btn-outline-secondary flex-fill"
                           type="button"
-                          onClick={() => setTampilDetail(false)}
+                          onClick={() => setProdukDipilih(null)}
                         >
                           Tutup
                         </button>
