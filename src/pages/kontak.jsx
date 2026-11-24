@@ -3,10 +3,8 @@ import { kontakSchema } from "../utils/validasiForm";
 
 function Kontak() {
   const kirimPesan = async (data) => {
-    console.log("mengirim...");
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("berhasil terkirim!");
-    console.log(data);
+    void data;
   };
 
   const {

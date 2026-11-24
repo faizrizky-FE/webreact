@@ -1,9 +1,28 @@
+import { useState } from "react";
 import { useWishlist } from "../context/WishlistContext";
 import { useKeranjang } from "../context/KeranjangContext";
+import { useNotifikasi } from "../context/NotifikasiContext";
 
 function Wishlist() {
   const { wishlist, setWishlist } = useWishlist();
   const { setKeranjang } = useKeranjang();
+  const { tampilkanNotifikasi } = useNotifikasi();
+  const [produkDihapus, setProdukDihapus] = useState(null);
+
+  const hapusProduk = () => {
+    if (!produkDihapus) return;
+    setWishlist((prev) =>
+      prev.filter(
+        (item) =>
+          item.id !== produkDihapus.id || item.nama !== produkDihapus.nama,
+      ),
+    );
+    tampilkanNotifikasi(
+      "wishlist-hapus",
+      "Produk berhasil dihapus dari Wishlist.",
+    );
+    setProdukDihapus(null);
+  };
 
   const beliSekarang = (product) => {
     setKeranjang((prev) => {
@@ -21,10 +40,16 @@ function Wishlist() {
 
       return [...prev, { ...product, jumlah: 1 }];
     });
+
+    tampilkanNotifikasi(
+      "keranjang",
+      "Produk berhasil ditambahkan ke keranjang.",
+    );
   };
 
   return (
-    <main className="py-5 my-5" id="wishlist">
+    <>
+      <main className="py-5 my-5" id="wishlist">
       <section>
         <div className="container px-0">
           <h1 className="fw-bold">Wishlist Saya</h1>
@@ -85,15 +110,7 @@ function Wishlist() {
                         <button
                           type="button"
                           className="btn rounded-circle position-absolute top-0 end-0 m-2 shadow-sm d-flex align-items-center justify-content-center fs-5"
-                          onClick={() =>
-                            setWishlist((prev) =>
-                              prev.filter(
-                                (item) =>
-                                  item.id !== product.id ||
-                                  item.nama !== product.nama,
-                              ),
-                            )
-                          }
+                          onClick={() => setProdukDihapus(product)}
                         >
                           <i className="bi bi-trash text-danger"></i>
                         </button>
@@ -188,7 +205,57 @@ function Wishlist() {
           )}
         </div>
       </section>
-    </main>
+      </main>
+
+      {produkDihapus && (
+        <>
+          <div
+            className="modal fade show d-block"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="konfirmasi-hapus-wishlist"
+          >
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title" id="konfirmasi-hapus-wishlist">
+                    Hapus dari Wishlist?
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    aria-label="Batal"
+                    onClick={() => setProdukDihapus(null)}
+                  />
+                </div>
+                <div className="modal-body">
+                  <i className="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                  Produk <strong>{produkDihapus.nama}</strong> akan dihapus dari
+                  wishlist.
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setProdukDihapus(null)}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={hapusProduk}
+                  >
+                    Ya, Hapus
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop fade show"></div>
+        </>
+      )}
+    </>
   );
 }
 

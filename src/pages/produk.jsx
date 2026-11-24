@@ -3,6 +3,7 @@ import { useProduk } from "../context/ProdukContext";
 import { useKeranjang } from "../context/KeranjangContext";
 import { useLocation } from "react-router-dom";
 import { useWishlist } from "../context/WishlistContext";
+import { useNotifikasi } from "../context/NotifikasiContext";
 
 const filterAwal = {
   kategori: [],
@@ -26,20 +27,28 @@ function Produk({ search }) {
   const { produk, produkSaya } = useProduk();
   const { setKeranjang } = useKeranjang();
   const { wishlist, setWishlist } = useWishlist();
+  const { tampilkanNotifikasi } = useNotifikasi();
 
   const semuaProduk = [...produk, ...produkSaya];
   const toggleWishlist = (product) => {
-    setWishlist((prev) => {
-      const sudahAda = prev.some(
-        (item) => item.id === product.id && item.nama === product.nama,
-      );
+    const sudahAda = wishlist.some(
+      (item) => item.id === product.id && item.nama === product.nama,
+    );
 
-      return sudahAda
+    setWishlist((prev) =>
+      sudahAda
         ? prev.filter(
             (item) => item.id !== product.id || item.nama !== product.nama,
           )
-        : [...prev, product];
-    });
+        : [...prev, product],
+    );
+
+    tampilkanNotifikasi(
+      sudahAda ? "wishlist-hapus" : "wishlist-tambah",
+      sudahAda
+        ? "Produk berhasil dihapus dari Wishlist."
+        : "Produk berhasil ditambahkan ke Wishlist.",
+    );
   };
   const daftarBrand = [
     ...new Set(semuaProduk.map((item) => item.brand).filter(Boolean)),
@@ -159,6 +168,11 @@ function Produk({ search }) {
 
       return [...prev, { ...produkDipilih, jumlah: jumlahBeli }];
     });
+
+    tampilkanNotifikasi(
+      "keranjang",
+      "Produk berhasil ditambahkan ke keranjang.",
+    );
 
     setProdukDipilih(null);
   };
@@ -544,7 +558,7 @@ function Produk({ search }) {
       </section>
 
       <section>
-        <div className="container px-0 pt-3 pb-5">
+        <div className="container px-0 pt-3 pb-4">
           <div className="row row-cols-1 row-cols-md-4 g-3">
             {hasilFilter.length === 0 ? (
               <div className="col-12 text-center py-5">
@@ -705,50 +719,52 @@ function Produk({ search }) {
           </div>
         </div>
         {totalHalaman > 1 && (
-          <nav className="d-flex justify-content-center pb-5">
-            <ul className="pagination mb-0">
-              <li
-                className={`page-item ${halamanAktif === 1 ? "disabled" : ""}`}
-              >
-                <button
-                  className="page-link"
-                  onClick={() => setHalamanAktif((prev) => prev - 1)}
-                  disabled={halamanAktif === 1}
-                >
-                  <i className="bi bi-chevron-left"></i>
-                </button>
-              </li>
-
-              {Array.from(
-                { length: nomorAkhir - nomorAwal + 1 },
-                (_, i) => nomorAwal + i,
-              ).map((halaman) => (
+          <div className="container px-0">
+            <nav className="d-flex justify-content-end">
+              <ul className="pagination mb-0">
                 <li
-                  key={halaman}
-                  className={`page-item ${halamanAktif === halaman ? "active" : ""}`}
+                  className={`page-item ${halamanAktif === 1 ? "disabled" : ""}`}
                 >
                   <button
                     className="page-link"
-                    onClick={() => setHalamanAktif(halaman)}
+                    onClick={() => setHalamanAktif((prev) => prev - 1)}
+                    disabled={halamanAktif === 1}
                   >
-                    {halaman}
+                    <i className="bi bi-chevron-left"></i>
                   </button>
                 </li>
-              ))}
 
-              <li
-                className={`page-item ${halamanAktif === totalHalaman ? "disabled" : ""}`}
-              >
-                <button
-                  className="page-link"
-                  onClick={() => setHalamanAktif((prev) => prev + 1)}
-                  disabled={halamanAktif === totalHalaman}
+                {Array.from(
+                  { length: nomorAkhir - nomorAwal + 1 },
+                  (_, i) => nomorAwal + i,
+                ).map((halaman) => (
+                  <li
+                    key={halaman}
+                    className={`page-item ${halamanAktif === halaman ? "active" : ""}`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => setHalamanAktif(halaman)}
+                    >
+                      {halaman}
+                    </button>
+                  </li>
+                ))}
+
+                <li
+                  className={`page-item ${halamanAktif === totalHalaman ? "disabled" : ""}`}
                 >
-                  <i className="bi bi-chevron-right"></i>
-                </button>
-              </li>
-            </ul>
-          </nav>
+                  <button
+                    className="page-link"
+                    onClick={() => setHalamanAktif((prev) => prev + 1)}
+                    disabled={halamanAktif === totalHalaman}
+                  >
+                    <i className="bi bi-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
         )}
       </section>
 

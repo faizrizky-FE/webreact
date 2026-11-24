@@ -44,7 +44,7 @@ export function ProdukProvider({ children }) {
             tags: product.tags,
           })),
         );
-      } catch (error) {
+      } catch {
         setError("Gagal mengambil produk");
       } finally {
         setLoading(false);

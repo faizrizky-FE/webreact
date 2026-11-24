@@ -4,18 +4,25 @@ import { profileSchema, produkSchema } from "../utils/validasiForm";
 import { useProduk } from "../context/ProdukContext";
 
 function Profile() {
+  const [profil, setProfil] = useState({
+    nama: "Guest",
+    email: "example@gmail.com",
+  });
+
   const { produkSaya, setProdukSaya } = useProduk();
-  const [jumlahProduk, setJumlahProduk] = useState(4);
   const [tampilPopup, setTampilPopup] = useState(false);
   const [fotoProfil, setFotoProfil] = useState(null);
   const [produkEdit, setProdukEdit] = useState(null);
 
   const kirimPesan = async (data) => {
-    console.log("mengirim...");
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("berhasil terkirim!");
-    console.log(data);
+
+    setProfil({
+      nama: data.nama,
+      email: data.email,
+    });
   };
+
   const simpanProduk = async (data) => {
     const file = data.gambarFile?.[0];
 
@@ -121,16 +128,25 @@ function Profile() {
                     />
                   </div>
                   <div className="lh-1">
-                    <h2 className="fw-bold">Faiz Rizky S.</h2>
+                    <h2 className="fw-bold">{profil.nama}</h2>
                     <p className="text-secondary">
-                      <i className="bi bi-envelope"> example@gmail.com</i>
+                      <i className="bi bi-envelope"> {profil.email}</i>
                     </p>
                     <span className="badge rounded-pill bg-primary-subtle text-primary px-3 py-2">
                       <i className="bi bi-shield-shaded"></i> Pengguna
                     </span>
                     <br />
-                    <button className="btn btn-text text-danger mt-2">
-                      <i className="bi bi-box-arrow-in-left me-1"></i>Logout
+                    <button
+                      className="btn btn-text text-danger mt-2"
+                      onClick={() =>
+                        setProfil({
+                          nama: "Guest",
+                          email: "example@gmail.com",
+                        })
+                      }
+                    >
+                      <i className="bi bi-box-arrow-in-left me-1"></i>
+                      Logout
                     </button>
                   </div>
                 </div>

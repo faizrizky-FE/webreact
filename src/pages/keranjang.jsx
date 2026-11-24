@@ -1,7 +1,11 @@
+import { useState } from "react";
 import { useKeranjang } from "../context/KeranjangContext";
+import { useNotifikasi } from "../context/NotifikasiContext";
 
 function Keranjang() {
   const { keranjang, setKeranjang } = useKeranjang();
+  const { tampilkanNotifikasi } = useNotifikasi();
+  const [produkDihapus, setProdukDihapus] = useState(null);
 
   const formatRupiah = (harga) => "Rp " + harga.toLocaleString("id-ID");
 
@@ -15,8 +19,14 @@ function Keranjang() {
     );
   };
 
-  const hapusProduk = (id) => {
-    setKeranjang((prev) => prev.filter((item) => item.id !== id));
+  const hapusProduk = () => {
+    if (!produkDihapus) return;
+    setKeranjang((prev) => prev.filter((item) => item.id !== produkDihapus.id));
+    tampilkanNotifikasi(
+      "keranjang-hapus",
+      "Produk berhasil dihapus dari keranjang.",
+    );
+    setProdukDihapus(null);
   };
 
   const totalProduk = keranjang.reduce((total, item) => total + item.jumlah, 0);
@@ -165,7 +175,7 @@ function Keranjang() {
                             <button
                               className="btn btn-link text-secondary p-1"
                               type="button"
-                              onClick={() => hapusProduk(item.id)}
+                              onClick={() => setProdukDihapus(item)}
                               title="Hapus produk"
                             >
                               <i className="bi bi-trash3 fs-5"></i>
@@ -220,6 +230,55 @@ function Keranjang() {
           </div>
         </div>
       </div>
+
+      {produkDihapus && (
+        <>
+          <div
+            className="modal fade show d-block"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="konfirmasi-hapus-keranjang"
+          >
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title" id="konfirmasi-hapus-keranjang">
+                    Hapus dari Keranjang?
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    aria-label="Batal"
+                    onClick={() => setProdukDihapus(null)}
+                  />
+                </div>
+                <div className="modal-body">
+                  <i className="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                  Produk <strong>{produkDihapus.nama}</strong> akan dihapus dari
+                  keranjang.
+                </div>
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setProdukDihapus(null)}
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={hapusProduk}
+                  >
+                    Ya, Hapus
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop fade show"></div>
+        </>
+      )}
     </main>
   );
 }

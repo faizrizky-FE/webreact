@@ -1,0 +1,129 @@
+/* Wadah: pojok kanan bawah, tumpuk ke atas */
+.daftar-notif {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none; /* area kosong tidak menghalangi klik */
+}
+
+.daftar-notif .notif {
+  position: relative;
+  right: auto;
+  bottom: auto;
+  z-index: auto;
+  transition: transform 0.25s ease; /* area kosong tidak menghalangi klik */
+}
+
+/* Warna per tipe */
+.notif-success {
+  --warna: var(--bs-success);
+  --warna-lembut: var(--bs-success-bg-subtle);
+}
+.notif-danger {
+  --warna: var(--bs-danger);
+  --warna-lembut: var(--bs-danger-bg-subtle);
+}
+.notif-secondary {
+  --warna: var(--bs-secondary);
+  --warna-lembut: var(--bs-secondary-bg-subtle);
+}
+
+/* Kartu notifikasi */
+.notif {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1200;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  width: 340px;
+  max-width: calc(100vw - 2rem); /* aman di HP */
+  padding: 1rem 1rem 1.1rem 1.25rem;
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  pointer-events: auto;
+  animation: notif-masuk 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+/* Strip warna di kiri */
+.notif::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: var(--warna);
+}
+
+.notif.keluar {
+  animation: notif-keluar 0.25s ease-in forwards;
+}
+
+/* Ikon bulat dengan cincin lembut */
+.notif-ikon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  font-size: 1.15rem;
+  color: #fff;
+  background: var(--warna);
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px var(--warna-lembut);
+}
+
+/* Progress bar di bawah */
+.notif-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: var(--warna);
+  opacity: 0.8;
+  transform-origin: left;
+  animation: notif-habis linear forwards;
+}
+
+/* Berhenti saat kursor di atas notif */
+.notif:hover .notif-progress {
+  animation-play-state: paused;
+}
+
+@keyframes notif-masuk {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes notif-keluar {
+  to {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+
+@keyframes notif-habis {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}

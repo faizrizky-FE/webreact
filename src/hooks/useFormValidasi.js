@@ -23,8 +23,7 @@ function useFormValidasi(schema, onSubmit) {
       await onSubmit(data);
       reset();
       setBerhasil(true);
-    } catch (error) {
-      console.log("Gagal mengirim data:", error);
+    } catch {
       setGagal(true);
     }
   });
@@ -35,16 +34,9 @@ function useFormValidasi(schema, onSubmit) {
   };
 
   const batalForm = () => {
-  reset({
-    nama: "",
-    email: "",
-    deskripsi: "",
-    harga: "",
-    gambarFile: undefined,
-    gambarUrl: "",
-  });
-  resetStatus();
-};
+    reset();
+    resetStatus();
+  };
 
   return {
     register,
@@ -55,7 +47,7 @@ function useFormValidasi(schema, onSubmit) {
     berhasil,
     gagal,
     resetStatus,
-    batalForm
+    batalForm,
   };
 }
 

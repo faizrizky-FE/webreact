@@ -1,6 +1,8 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useProduk } from "../context/ProdukContext";
 import { useState } from "react";
+import { useKeranjang } from "../context/KeranjangContext";
+import { useWishlist } from "../context/WishlistContext";
 
 export function Navbar({
   search,
@@ -10,10 +12,17 @@ export function Navbar({
   setTampilSaran,
 }) {
   const { produk, produkSaya } = useProduk();
+  const { keranjang } = useKeranjang();
+  const { wishlist } = useWishlist();
+  const jumlahKeranjang = keranjang.reduce(
+    (total, item) => total + item.jumlah,
+    0,
+  );
+
+  const jumlahWishlist = wishlist.length;
+
   const navigate = useNavigate();
-
   const [bukaPencarian, setBukaPencarian] = useState(false);
-
   const semuaProduk = [...produk, ...produkSaya];
 
   const saranKategori = [
@@ -143,7 +152,7 @@ export function Navbar({
                 }
               >
                 <i
-                  className={`bi ${bukaPencarian ? "bi-x-lg" : "bi-search"}`}
+                  className={`bi ${bukaPencarian ? "bi-x-lg" : "bi-search fs-5"}`}
                 ></i>
               </button>
 
@@ -187,14 +196,36 @@ export function Navbar({
               )}
             </div>
 
-            {/* Wishlist */}
-            <NavLink to="/wishlist" className="mx-2 fs-5 text-danger">
+            <NavLink
+              to="/wishlist"
+              className="mx-2 fs-5 text-danger position-relative"
+            >
               <i className="bi bi-heart"></i>
+
+              {jumlahWishlist > 0 && (
+                <span
+                  className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger mt-1"
+                  style={{ fontSize: "9px" }}
+                >
+                  {jumlahWishlist}
+                </span>
+              )}
             </NavLink>
 
-            {/* Keranjang */}
-            <NavLink to="/keranjang" className="mx-2 fs-5 text-warning">
+            <NavLink
+              to="/keranjang"
+              className="mx-2 fs-4 text-success position-relative"
+            >
               <i className="bi bi-cart3"></i>
+
+              {jumlahKeranjang > 0 && (
+                <span
+                  className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger mt-2"
+                  style={{ fontSize: "9px" }}
+                >
+                  {jumlahKeranjang}
+                </span>
+              )}
             </NavLink>
 
             {/* Profile */}
